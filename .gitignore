@@ -39,3 +39,14 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Túneles / binarios / salidas locales
+cloudflared
+cloudflared.log
+ngrok.log
+fix.log
+lt.log
+myip.txt
+out.txt
+out_local.txt
+out_tunnel.txt
