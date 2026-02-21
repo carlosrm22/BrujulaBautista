@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { initDb } from '../src/db/initDb';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldPlaySound: true,
+    shouldPlaySound: false,   // OFF por defecto según PRD (baja carga sensorial)
     shouldSetBadge: false,
     shouldShowBanner: true,
     shouldShowList: true,
@@ -33,6 +33,16 @@ export default function RootLayout() {
         console.warn('No se otorgaron permisos de notificación.');
       }
     });
+
+    // Navegar a sesion-foco con CTA cuando el usuario toca una notificación de bedtime
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data as { cta?: string } | undefined;
+      if (data?.cta === 'bedtime') {
+        router.navigate({ pathname: '/sesion-foco', params: { cta: 'bedtime' } });
+      }
+    });
+
+    return () => sub.remove();
   }, []);
 
   if (!ready) return null;
@@ -64,6 +74,7 @@ export default function RootLayout() {
         <Stack.Screen name="social" />
         <Stack.Screen name="protocolos/[id]" />
         <Stack.Screen name="ajustes/plantillas" />
+        <Stack.Screen name="sesion-foco" />
       </Stack>
     </>
   );
