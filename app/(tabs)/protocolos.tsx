@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getAllProtocols } from '../../src/db/protocols';
 import type { Protocol } from '../../src/db/protocols';
+import { InfoTip } from '../../src/components/InfoTip';
 
 export default function ProtocolosScreen() {
   const [list, setList] = useState<Protocol[]>([]);
@@ -26,6 +27,10 @@ export default function ProtocolosScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.title}>Protocolos</Text>
+        <InfoTip
+          title="¿Qué son los protocolos?"
+          description="Una lista paso a paso de tareas complejas pero recurrentes para hacer en automático sin tener que pensar el proceso cada vez."
+        />
       </View>
       <FlatList
         data={list}
@@ -39,7 +44,7 @@ export default function ProtocolosScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#f8fafc' },
-  header: { padding: 16 },
+  header: { padding: 16, flexDirection: 'row', alignItems: 'center', gap: 8 },
   title: { fontSize: 24, fontWeight: '600' },
   list: { padding: 16, paddingTop: 8 },
   card: {

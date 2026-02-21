@@ -144,3 +144,22 @@ export async function getCheckInStats(
   };
 }
 
+export async function deleteCheckIn(id: number): Promise<void> {
+  const database = getDb();
+  if (!database) return;
+  await database.runAsync('DELETE FROM checkins WHERE id = ?', id);
+}
+
+export async function keepOnlyLastNCheckIns(n: number = 3): Promise<void> {
+  const database = getDb();
+  if (!database) return;
+  // Borrar todos los checkins cuyo ID no esté entre los N más recientes
+  await database.runAsync(`
+    DELETE FROM checkins 
+    WHERE id NOT IN (
+      SELECT id FROM checkins ORDER BY timestamp DESC LIMIT ?
+    )
+  `, n);
+}
+
+

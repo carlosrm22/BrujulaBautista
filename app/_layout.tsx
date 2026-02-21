@@ -2,7 +2,17 @@ import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import * as Notifications from 'expo-notifications';
 import { initDb } from '../src/db/initDb';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 export default function RootLayout() {
   const [ready, setReady] = useState(false);
@@ -16,6 +26,13 @@ export default function RootLayout() {
         }
         setReady(true);
       });
+
+    // Pedir permisos de notificación al abrir la app
+    Notifications.requestPermissionsAsync().then((status) => {
+      if (status.status !== 'granted') {
+        console.warn('No se otorgaron permisos de notificación.');
+      }
+    });
   }, []);
 
   if (!ready) return null;
@@ -42,7 +59,7 @@ export default function RootLayout() {
       <StatusBar style="auto" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="rojo-descarga" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="rojo-descarga" />
         <Stack.Screen name="pedir-apoyo" />
         <Stack.Screen name="social" />
         <Stack.Screen name="protocolos/[id]" />

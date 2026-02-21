@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getProtocolById } from '../../src/db/protocols';
 
 export default function ProtocoloDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const navigation = useNavigation();
   const [nombre, setNombre] = useState('');
   const [pasos, setPasos] = useState<string[]>([]);
   const [checked, setChecked] = useState<Record<number, boolean>>({});
@@ -19,6 +20,10 @@ export default function ProtocoloDetailScreen() {
       }
     });
   }, [id]);
+
+  useEffect(() => {
+    if (nombre) navigation.setOptions({ title: nombre });
+  }, [nombre, navigation]);
 
   const toggleCheck = (index: number) => {
     setChecked((c) => ({ ...c, [index]: !c[index] }));

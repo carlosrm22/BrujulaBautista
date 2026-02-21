@@ -62,3 +62,26 @@ Acciones globales (desde Estado): **ROJO: Descarga**, **Pedir apoyo (WhatsApp)**
 * IA obligatoria en la nube
 * Diagnóstico o puntuaciones clínicas
 * Gamificación de hábitos
+
+---
+
+## 7) v0.2 — Guardián de hiperfoco
+
+**Concepto**: Un modo preventivo para proteger el sueño y evitar el secuestro cognitivo del hiperfoco sin apagar la sesión abruptamente.
+
+### Funcionalidades Core (MVP)
+1. **Inicio de Sesión**: Un botón "Sesión de foco" accesible directamente desde el Tab **Estado**.
+2. **Dashboard de Sesión**: Muestra tiempo transcurrido, próximo corte, y botones grandes de acción (Pausa 2 min, Seguir 25 min, Cierre 10 min, Terminar).
+3. **Integración "Arranque 2 min"**: Opción automática para arrancar el guardián de hiperfoco tras iniciar una tarea de arranque (Opción B).
+4. **Cortes y Escalado Notificacional**:
+   * Recordatorio suave cada X min (ej. 45 min).
+   * Al llegar a la **Hora límite de sueño**, muestra aviso firme + "plan de cierre".
+   * Si excede +30/+60 min la hora límite, muestra un botón directo para **Pedir apoyo por WhatsApp** ("recuérdame dormir").
+5. **Aftercare**: Al terminar una sesión, sugiere registrar check-in o ir a ROJO: Descarga.
+
+### Criterios de Aceptación (v0.2)
+* Puedo iniciar una "Sesión de foco" con 1 toque desde la pantalla de Estado o tras completar un "Arranque 2 min".
+* Si pasan 60 min sin break, aparece una notificación local (silenciosa).
+* Si es después de mi hora límite (ej. 01:00 AM), la app me exige un "Cierre 10 min" o me muestra un CTA para pedir ayuda por WhatsApp.
+* Todo el historial de hiperfoco (`focus_sessions`) se guarda localmente y se incluye en la exportación manual de Ajustes.
+* La funcionalidad está controlada por configuraciones en Ajustes (Hora límite, Frecuencia de corte, Escalado nocturno).

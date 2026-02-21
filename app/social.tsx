@@ -17,6 +17,11 @@ export default function SocialScreen() {
   const [costoSensorial, setCostoSensorial] = useState(0);
   const [guardado, setGuardado] = useState(false);
 
+  const showGuardado = () => {
+    setGuardado(true);
+    setTimeout(() => setGuardado(false), 2000);
+  };
+
   const handleGuardarAntes = async () => {
     await insertSocialLog({
       fase: 'antes',
@@ -24,7 +29,7 @@ export default function SocialScreen() {
       riesgo_sensorial: riesgo || undefined,
       llevar_tapones: llevarTapones ? 1 : 0,
     });
-    setGuardado(true);
+    showGuardado();
   };
 
   const handleRegistrarDespues = async () => {
@@ -33,7 +38,7 @@ export default function SocialScreen() {
       costo_social: costoSocial,
       costo_sensorial: costoSensorial,
     });
-    setGuardado(true);
+    showGuardado();
     if (costoSocial >= 7 || costoSensorial >= 7) {
       router.push('/rojo-descarga');
     }
@@ -91,8 +96,8 @@ export default function SocialScreen() {
                 <Text style={styles.toggleText}>{llevarTapones ? 'Sí' : 'No'}</Text>
               </Pressable>
             </View>
-            <Pressable style={styles.btn} onPress={handleGuardarAntes}>
-              <Text style={styles.btnText}>Guardar</Text>
+            <Pressable style={[styles.btn, guardado && { backgroundColor: '#10b981' }]} onPress={handleGuardarAntes}>
+              <Text style={styles.btnText}>{guardado ? '✓ Guardado' : 'Guardar'}</Text>
             </Pressable>
           </>
         )}
@@ -108,8 +113,8 @@ export default function SocialScreen() {
               value={Math.round(costoSensorial)}
               onValueChange={setCostoSensorial}
             />
-            <Pressable style={styles.btn} onPress={handleRegistrarDespues}>
-              <Text style={styles.btnText}>Registrar</Text>
+            <Pressable style={[styles.btn, guardado && { backgroundColor: '#10b981' }]} onPress={handleRegistrarDespues}>
+              <Text style={styles.btnText}>{guardado ? '✓ Registrado' : 'Registrar'}</Text>
             </Pressable>
             {(costoSocial >= 7 || costoSensorial >= 7) && (
               <Pressable style={[styles.btn, styles.btnSec]} onPress={() => router.push('/rojo-descarga')}>

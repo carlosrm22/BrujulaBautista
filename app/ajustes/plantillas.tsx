@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Pressable } from 'react-native';
-import { router } from 'expo-router';
+import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getPartnerTemplates, updatePartnerTemplate } from '../../src/db/partnerTemplates';
 
@@ -28,9 +27,6 @@ export default function PlantillasScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <Pressable style={styles.back} onPress={() => router.back()}>
-          <Text style={styles.backText}>Atrás</Text>
-        </Pressable>
         <Text style={styles.title}>Plantillas WhatsApp</Text>
         <Text style={styles.sectionTitle}>Pedidos</Text>
         {pedidos.map((p) => (
@@ -63,8 +59,6 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#f8fafc' },
   scroll: { flex: 1 },
   scrollContent: { padding: 16, paddingBottom: 32 },
-  back: { marginBottom: 16 },
-  backText: { fontSize: 16, color: '#2563eb' },
   title: { fontSize: 22, fontWeight: '600', marginBottom: 16 },
   sectionTitle: { fontSize: 18, fontWeight: '600', marginBottom: 8 },
   row: { marginBottom: 12 },

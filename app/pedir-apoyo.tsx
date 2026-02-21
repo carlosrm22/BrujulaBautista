@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Share } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Platform, Alert } from 'react-native';
 import { router } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
+import * as Linking from 'expo-linking';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getPartnerTemplates } from '../src/db/partnerTemplates';
 import { getLatestCheckIn } from '../src/db/checkins';
@@ -37,16 +38,29 @@ export default function PedirApoyoScreen() {
 
   const handleShare = async () => {
     if (!mensaje) return;
+    const text = encodeURIComponent(mensaje);
+    const url = Platform.OS === 'web'
+      ? `https://wa.me/?text=${text}`
+      : `whatsapp://send?text=${text}`;
+
     try {
-      await Share.share({ message: mensaje, title: 'Pedir apoyo' });
+      const can = await Linking.canOpenURL(url);
+      if (can) {
+        await Linking.openURL(url);
+      } else {
+        await Clipboard.setStringAsync(mensaje);
+        Alert.alert('Copiado', 'No se pudo abrir WhatsApp. El mensaje se ha copiado al portapapeles.');
+      }
     } catch {
       await Clipboard.setStringAsync(mensaje);
+      Alert.alert('Copiado', 'Mensaje copiado al portapapeles.');
     }
   };
 
   const handleCopy = async () => {
     if (!mensaje) return;
     await Clipboard.setStringAsync(mensaje);
+    Alert.alert('Copiado', 'Mensaje copiado al portapapeles.');
   };
 
   return (

@@ -25,6 +25,8 @@ export interface TaskRow {
   tiempo_min: number;
   estado: string;
   created_at: number;
+  tiempo_dedicado?: number;
+  completed_at?: number;
 }
 
 export interface ProtocolRow {
@@ -42,15 +44,16 @@ export interface PartnerTemplateRow {
   orden: number;
 }
 
-export interface SocialLogRow {
+export interface FocusSessionRow {
   id: number;
-  timestamp: number;
-  fase: 'antes' | 'despues';
-  duracion?: string;
-  riesgo_sensorial?: string;
-  llevar_tapones?: number;
-  costo_social?: number;
-  costo_sensorial?: number;
+  start_ts: number;
+  end_ts?: number;
+  label?: string;
+  linked_task_id?: number;
+  break_minutes?: number;
+  bedtime_minutes?: number; // minutos desde medianoche (e.g. 01:00 -> 60)
+  ended_reason?: string;
+  over_bedtime_minutes?: number;
 }
 
 let db: SQLite.SQLiteDatabase | null = null;
@@ -76,7 +79,9 @@ CREATE TABLE IF NOT EXISTS tasks (
   requiere_tecnica INTEGER NOT NULL,
   tiempo_min INTEGER NOT NULL,
   estado TEXT NOT NULL,
-  created_at INTEGER NOT NULL
+  created_at INTEGER NOT NULL,
+  tiempo_dedicado INTEGER,
+  completed_at INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS protocols (
@@ -109,12 +114,46 @@ CREATE TABLE IF NOT EXISTS settings (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS focus_sessions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  start_ts INTEGER NOT NULL,
+  end_ts INTEGER,
+  label TEXT,
+  linked_task_id INTEGER,
+  break_minutes INTEGER,
+  bedtime_minutes INTEGER,
+  ended_reason TEXT,
+  over_bedtime_minutes INTEGER
+);
 `;
 
 export async function initDb(): Promise<SQLite.SQLiteDatabase> {
   if (db) return db;
   db = await SQLite.openDatabaseAsync(DB_NAME);
   await db.execAsync(SCHEMA);
+
+  const { user_version } = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version') || { user_version: 0 };
+  let currentVersion = user_version;
+
+  if (currentVersion === 0) {
+    try {
+      await db.execAsync('ALTER TABLE tasks ADD COLUMN tiempo_dedicado INTEGER;');
+    } catch (e) { }
+    try {
+      await db.execAsync('ALTER TABLE tasks ADD COLUMN completed_at INTEGER;');
+    } catch (e) { }
+    currentVersion = 1;
+    await db.execAsync(`PRAGMA user_version = ${currentVersion}`);
+  }
+
+  if (currentVersion === 1) {
+    // Si la DB ya tenía `tasks` pero no `focus_sessions`, aunque CREATE TABLE IF NOT EXISTS ayuda,
+    // este es el lugar oficial para futuras modificaciones de v1 a v2.
+    currentVersion = 2;
+    await db.execAsync(`PRAGMA user_version = ${currentVersion}`);
+  }
+
   return db;
 }
 

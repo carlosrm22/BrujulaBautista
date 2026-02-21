@@ -1,4 +1,5 @@
 import { getDb } from './initDb';
+import type { SocialLogRow } from './initDb.native';
 
 export interface SocialLogInsert {
   fase: 'antes' | 'despues';
@@ -24,4 +25,20 @@ export async function insertSocialLog(row: SocialLogInsert): Promise<number> {
     row.costo_sensorial ?? null
   );
   return result.lastInsertRowId;
+}
+
+export async function getSocialLogs(limit = 100): Promise<SocialLogRow[]> {
+  const database = getDb();
+  if (!database) return [];
+  const rows = await database.getAllAsync<SocialLogRow>(
+    `SELECT * FROM social_logs ORDER BY timestamp DESC LIMIT ?`,
+    limit
+  );
+  return rows;
+}
+
+export async function deleteSocialLog(id: number): Promise<void> {
+  const database = getDb();
+  if (!database) throw new Error('DB not initialized');
+  await database.runAsync(`DELETE FROM social_logs WHERE id = ?`, id);
 }

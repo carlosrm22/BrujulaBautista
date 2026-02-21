@@ -89,6 +89,16 @@ export default function EstadoScreen() {
             </Pressable>
             <InfoTip title="Arranque 2 min" description="Cuando no sabes por dónde empezar una tarea. Te guía paso a paso en 2 minutos para definir qué hacer, dónde empezar y cuál es el primer paso concreto." />
           </View>
+
+          <View style={styles.btnRow}>
+            <Pressable
+              style={({ pressed }) => [styles.focusBtn, styles.btnFlex, pressed && styles.btnPressed]}
+              onPress={() => router.push('/sesion-foco')}
+            >
+              <Text style={styles.focusBtnText}>Sesión de foco</Text>
+            </Pressable>
+            <InfoTip title="Sesión de Foco (Guardián)" description="Un modo para hiperfoco que te recuerda tomar cortes suaves y te avisa cuando es tu hora límite de dormir. Útil para evitar el secuestro cognitivo prolongado." />
+          </View>
           <View style={styles.btnRow}>
             <Pressable
               style={({ pressed }) => [styles.btn, styles.btnFlex, pressed && styles.btnPressed]}
@@ -131,8 +141,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    marginBottom: 8,
     alignItems: 'center',
+    marginBottom: 8,
   },
   semaforoText: { fontSize: 20, fontWeight: '700', color: '#fff' },
   copyAux: { fontSize: 14, color: '#64748b', marginBottom: 16 },
@@ -160,4 +170,16 @@ const styles = StyleSheet.create({
   btnFlex: { flex: 1 },
   btnPressed: { opacity: 0.9 },
   btnText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  focusBtn: {
+    backgroundColor: '#7c3aed',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  focusBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
 });
