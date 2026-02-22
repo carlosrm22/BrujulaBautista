@@ -4,11 +4,13 @@ import { router } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../src/context/ThemeContext';
 import { getPartnerTemplates } from '../src/db/partnerTemplates';
 import { getLatestCheckIn } from '../src/db/checkins';
 import type { SemaphoreResult } from '../src/db/initDb';
 
 export default function PedirApoyoScreen() {
+  const { colors } = useTheme();
   const [pedidos, setPedidos] = useState<{ id: number; texto: string }[]>([]);
   const [acciones, setAcciones] = useState<{ id: number; texto: string }[]>([]);
   const [estado, setEstado] = useState<SemaphoreResult>('AMARILLO');
@@ -64,9 +66,9 @@ export default function PedirApoyoScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Pedir apoyo</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Pedir Apoyo</Text>
         <Text style={styles.label}>Estado</Text>
         <View style={styles.estadoRow}>
           {(['VERDE', 'AMARILLO', 'ROJO'] as const).map((e) => (

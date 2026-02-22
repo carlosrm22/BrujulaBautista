@@ -7,8 +7,10 @@ import { InfoTip } from '../../src/components/InfoTip';
 import { computeSemaphore, SEMAFORO_COPY } from '../../src/semaphore/computeSemaphore';
 import type { SemaphoreResult } from '../../src/db/initDb';
 import { insertCheckIn, getLatestCheckIn } from '../../src/db/checkins';
+import { useTheme } from '../../src/context/ThemeContext';
 
 export default function EstadoScreen() {
+  const { colors } = useTheme();
   const [energia, setEnergia] = useState(5);
   const [sensorial, setSensorial] = useState(0);
   const [social, setSocial] = useState(0);
@@ -52,13 +54,13 @@ export default function EstadoScreen() {
   const semaforoBg = semaforo === 'VERDE' ? '#22c55e' : semaforo === 'AMARILLO' ? '#eab308' : '#ef4444';
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Estado</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Estado</Text>
         <View style={[styles.semaforoBox, { backgroundColor: semaforoBg }]}>
           <Text style={styles.semaforoText}>{semaforo}</Text>
         </View>
-        <Text style={styles.copyAux}>{copySemaforo}</Text>
+        <Text style={[styles.copyAux, { color: colors.textMuted }]}>{copySemaforo}</Text>
 
         <ValueStepper label="Energía física" value={energia} onValueChange={setEnergia}
           info="¿Cuánta energía corporal sientes ahora? 0 = agotado, no puedo moverme. 5 = normal. 10 = con mucha energía. Si estás en 2 o menos, el semáforo será ROJO." />

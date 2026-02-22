@@ -9,8 +9,10 @@ import { getSetting, setSetting } from '../../src/db/settings';
 import { DEFAULT_ROJO_CHECKLIST, SETTINGS_KEY_ROJO_CHECKLIST } from '../../src/constants/rojoChecklist';
 import { getDb } from '../../src/db/initDb';
 import { InfoTip } from '../../src/components/InfoTip';
+import { useTheme } from '../../src/context/ThemeContext';
 
 export default function AjustesScreen() {
+  const { colors, theme, toggleTheme } = useTheme();
   const [rojoChecklist, setRojoChecklist] = useState<string[]>(DEFAULT_ROJO_CHECKLIST);
   const [editSection, setEditSection] = useState<'none' | 'rojo' | 'foco'>('none');
   const [focoBreak, setFocoBreak] = useState('45');
@@ -124,12 +126,12 @@ export default function AjustesScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Ajustes</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Ajustes</Text>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Checklist ROJO</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Checklist ROJO</Text>
           <InfoTip
             title="Checklist ROJO"
             description="Esta es la lista de acciones rápidas sugeridas cuando entras en estado rojo (alta sobrecarga y baja energía)."
@@ -155,13 +157,13 @@ export default function AjustesScreen() {
           </Pressable>
         )}
 
-        <Text style={styles.sectionTitle}>Plantillas WhatsApp</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Plantillas WhatsApp</Text>
         <Pressable style={styles.link} onPress={() => router.push('/ajustes/plantillas')}>
           <Text style={styles.linkText}>Editar pedidos y acciones sugeridas</Text>
         </Pressable>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Guardián de Hiperfoco</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Guardián de Hiperfoco</Text>
           <InfoTip
             title="Ajustes de Hiperfoco"
             description="Controla la frecuencia de los cortes suaves y establece la hora estimada a la que quieres irte a dormir."
@@ -179,14 +181,14 @@ export default function AjustesScreen() {
             />
 
             {/* Picker HH:MM para hora de dormir */}
-            <Text style={styles.label}>Hora de ir a dormir</Text>
-            <View style={styles.timePicker}>
+            <Text style={[styles.label, { color: colors.textSecond }]}>Hora de ir a dormir</Text>
+            <View style={[styles.timePicker, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
               {/* Horas */}
               <View style={styles.timeCol}>
                 <Pressable style={styles.timeBtn} onPress={() => setBedtimeHour(h => clampHour(h + 1))}>
                   <Text style={styles.timeBtnText}>▲</Text>
                 </Pressable>
-                <Text style={styles.timeNum}>{pad2(bedtimeHour)}</Text>
+                <Text style={[styles.timeNum, { color: colors.text }]}>{pad2(bedtimeHour)}</Text>
                 <Pressable style={styles.timeBtn} onPress={() => setBedtimeHour(h => clampHour(h - 1))}>
                   <Text style={styles.timeBtnText}>▼</Text>
                 </Pressable>
@@ -197,7 +199,7 @@ export default function AjustesScreen() {
                 <Pressable style={styles.timeBtn} onPress={() => setBedtimeMin(m => clampMin(m + 5))}>
                   <Text style={styles.timeBtnText}>▲</Text>
                 </Pressable>
-                <Text style={styles.timeNum}>{pad2(bedtimeMin)}</Text>
+                <Text style={[styles.timeNum, { color: colors.text }]}>{pad2(bedtimeMin)}</Text>
                 <Pressable style={styles.timeBtn} onPress={() => setBedtimeMin(m => clampMin(m - 5))}>
                   <Text style={styles.timeBtnText}>▼</Text>
                 </Pressable>
@@ -215,16 +217,30 @@ export default function AjustesScreen() {
         )}
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Privacidad</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Privacidad</Text>
           <InfoTip
             title="Privacidad Local"
             description="Toda tu información está almacenada directamente en la base de datos de tu teléfono. No recopilamos analíticas ni enviamos datos a servidores."
           />
         </View>
-        <Text style={styles.copy}>Sin analíticas. Sin cuenta. Datos solo en este dispositivo.</Text>
+        <Text style={[styles.copy, { color: colors.textSecond }]}>Sin analíticas. Sin cuenta. Datos solo en este dispositivo.</Text>
+
+        {/* Toggle Tema */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Apariencia</Text>
+        </View>
+        <Pressable
+          style={[styles.themeToggle, { backgroundColor: colors.bgCard, borderColor: colors.border }]}
+          onPress={toggleTheme}
+        >
+          <Text style={{ fontSize: 22 }}>{theme === 'dark' ? '☀️' : '🌙'}</Text>
+          <Text style={[styles.themeToggleText, { color: colors.text }]}>
+            {theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+          </Text>
+        </Pressable>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Backup</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Backup</Text>
           <InfoTip
             title="Exportar en Texto Plano"
             description="El archivo exportado NO está cifrado. Contiene todo tu historial en texto plano. Envíalo o gúardalo en un lugar muy seguro bajo tu propia responsabilidad."
@@ -242,12 +258,12 @@ export default function AjustesScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#f8fafc' },
+  safe: { flex: 1 },
   scroll: { flex: 1 },
   scrollContent: { padding: 16, paddingBottom: 32 },
-  title: { fontSize: 24, fontWeight: '700', marginBottom: 24, color: '#0f172a' },
+  title: { fontSize: 24, fontWeight: '700', marginBottom: 24 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
-  sectionTitle: { fontSize: 18, fontWeight: '600', color: '#0f172a' },
+  sectionTitle: { fontSize: 18, fontWeight: '600' },
   link: { paddingVertical: 12, marginBottom: 16 },
   linkText: { fontSize: 16, color: '#7c3aed', fontWeight: '500' },
   input: {
@@ -257,7 +273,6 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 8,
     fontSize: 16,
-    backgroundColor: '#fff',
   },
   label: { fontSize: 14, fontWeight: '500', color: '#475569', marginBottom: 6 },
   btn: {
@@ -271,16 +286,22 @@ const styles = StyleSheet.create({
   btnSec: { backgroundColor: 'transparent', borderWidth: 2, borderColor: '#7c3aed' },
   btnText: { fontSize: 16, fontWeight: '700', color: '#fff' },
   btnTextSec: { fontSize: 16, fontWeight: '700', color: '#7c3aed' },
-  copy: { fontSize: 14, color: '#64748b', marginBottom: 24 },
-
-  // Time picker HH:MM
+  copy: { fontSize: 14, marginBottom: 16 },
+  themeToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 24,
+  },
+  themeToggleText: { fontSize: 16, fontWeight: '500' },
   timePicker: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#e2e8f0',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -294,7 +315,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   timeBtnText: { fontSize: 18, color: '#7c3aed', fontWeight: '700' },
-  timeNum: { fontSize: 40, fontWeight: '800', color: '#0f172a', fontVariant: ['tabular-nums'], minWidth: 56, textAlign: 'center' },
+  timeNum: { fontSize: 40, fontWeight: '800', fontVariant: ['tabular-nums'], minWidth: 56, textAlign: 'center' },
   timeSep: { fontSize: 40, fontWeight: '800', color: '#94a3b8', marginBottom: 4 },
 });
+
 

@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getProtocolById } from '../../src/db/protocols';
+import { useTheme } from '../src/context/ThemeContext';
 
 export default function ProtocoloDetailScreen() {
+  const { colors } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const navigation = useNavigation();
   const [nombre, setNombre] = useState('');
@@ -34,13 +36,13 @@ export default function ProtocoloDetailScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>{nombre}</Text>
+        <Text style={[styles.title, { color: colors.text }]}>{nombre}</Text>
         {pasos.map((paso, index) => (
           <Pressable key={index} style={styles.stepRow} onPress={() => toggleCheck(index)}>
-            <View style={[styles.checkbox, checked[index] && styles.checkboxChecked]} />
-            <Text style={[styles.stepText, checked[index] && styles.stepDone]}>{paso}</Text>
+            <View style={[styles.checkbox, { borderColor: colors.border }, checked[index] && styles.checkboxChecked]} />
+            <Text style={[styles.stepText, { color: colors.text }, checked[index] && styles.stepDone]}>{paso}</Text>
           </Pressable>
         ))}
         <Pressable style={styles.btn} onPress={handlePedirApoyo}>

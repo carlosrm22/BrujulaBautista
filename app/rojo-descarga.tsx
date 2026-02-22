@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../src/context/ThemeContext';
 import { getSetting } from '../src/db/settings';
 import { DEFAULT_ROJO_CHECKLIST, SETTINGS_KEY_ROJO_CHECKLIST } from '../src/constants/rojoChecklist';
 
 const DURACIONES = [10, 20, 40];
 
 export default function RojoDescargaScreen() {
+  const { colors } = useTheme();
   const [checklist, setChecklist] = useState<string[]>(DEFAULT_ROJO_CHECKLIST);
   const [checked, setChecked] = useState<Record<number, boolean>>({});
   const [duracion, setDuracion] = useState(20);
@@ -90,9 +92,9 @@ export default function RojoDescargaScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>ROJO: Descarga</Text>
+        <Text style={[styles.title, { color: colors.text }]}>ROJO: Descarga</Text>
         {checklist.map((item, index) => (
           <Pressable
             key={item + index}

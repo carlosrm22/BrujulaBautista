@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../src/context/ThemeContext';
 import { ValueStepper } from '../src/components/ValueStepper';
 import { insertSocialLog } from '../src/db/socialLogs';
 
@@ -9,6 +10,7 @@ const DURACION_OPTS = ['15m', '30m', '1h', '2h', 'No sé'];
 const RIESGO_OPTS = ['Bajo', 'Medio', 'Alto'];
 
 export default function SocialScreen() {
+  const { colors } = useTheme();
   const [tab, setTab] = useState<'antes' | 'despues'>('antes');
   const [duracion, setDuracion] = useState('');
   const [riesgo, setRiesgo] = useState('');
@@ -45,7 +47,7 @@ export default function SocialScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
       <View style={styles.tabs}>
         <Pressable
           style={[styles.tab, tab === 'antes' && styles.tabActive]}

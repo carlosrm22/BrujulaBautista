@@ -6,11 +6,13 @@ import * as Notifications from 'expo-notifications';
 import { startFocusSession, closeFocusSession, getActiveFocusSession } from '../src/db/focusSessions';
 import { getSetting } from '../src/db/settings';
 import type { FocusSessionRow } from '../src/db/initDb.native';
+import { useTheme } from '../src/context/ThemeContext';
 
 const DEFAULT_BREAK_MINUTES = 45;
 const DEFAULT_BEDTIME_MINUTES = 60; // 01:00 AM = 60 mins desde medianoche
 
 export default function SesionFocoScreen() {
+    const { colors } = useTheme();
     const { cta } = useLocalSearchParams<{ cta?: string }>();
     const [activeSession, setActiveSession] = useState<FocusSessionRow | null>(null);
     const [elapsedSecs, setElapsedSecs] = useState(0);
@@ -23,7 +25,7 @@ export default function SesionFocoScreen() {
 
     /** Break repetitivo: usa repeats:true para que el SO lo re-dispare solo */
     const scheduleBreakNotification = async (breakMins: number) => {
-        await Notifications.cancelScheduledNotificationAsync('focus-break').catch(() => {});
+        await Notifications.cancelScheduledNotificationAsync('focus-break').catch(() => { });
         await Notifications.scheduleNotificationAsync({
             identifier: 'focus-break',
             content: {
@@ -51,9 +53,9 @@ export default function SesionFocoScreen() {
 
         // Cancelar las tres anteriores
         await Promise.all([
-            Notifications.cancelScheduledNotificationAsync('focus-bedtime').catch(() => {}),
-            Notifications.cancelScheduledNotificationAsync('focus-bedtime+30').catch(() => {}),
-            Notifications.cancelScheduledNotificationAsync('focus-bedtime+60').catch(() => {}),
+            Notifications.cancelScheduledNotificationAsync('focus-bedtime').catch(() => { }),
+            Notifications.cancelScheduledNotificationAsync('focus-bedtime+30').catch(() => { }),
+            Notifications.cancelScheduledNotificationAsync('focus-bedtime+60').catch(() => { }),
         ]);
 
         // Alerta 1: hora límite exacta
@@ -138,7 +140,7 @@ export default function SesionFocoScreen() {
                 if (curAdj > bedAdj) setIsOvertime(true);
             }
         });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // ─── Mostrar CTA WhatsApp si llegó por notificación de bedtime ──────────────
@@ -163,7 +165,7 @@ export default function SesionFocoScreen() {
                 ]
             );
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [cta, activeSession]);
 
     // ─── Timer tick ─────────────────────────────────────────────────────────────
@@ -236,10 +238,10 @@ export default function SesionFocoScreen() {
 
         // Cancelar solo las notificaciones de hiperfoco
         await Promise.all([
-            Notifications.cancelScheduledNotificationAsync('focus-break').catch(() => {}),
-            Notifications.cancelScheduledNotificationAsync('focus-bedtime').catch(() => {}),
-            Notifications.cancelScheduledNotificationAsync('focus-bedtime+30').catch(() => {}),
-            Notifications.cancelScheduledNotificationAsync('focus-bedtime+60').catch(() => {}),
+            Notifications.cancelScheduledNotificationAsync('focus-break').catch(() => { }),
+            Notifications.cancelScheduledNotificationAsync('focus-bedtime').catch(() => { }),
+            Notifications.cancelScheduledNotificationAsync('focus-bedtime+30').catch(() => { }),
+            Notifications.cancelScheduledNotificationAsync('focus-bedtime+60').catch(() => { }),
         ]);
 
         if (over > 0) {
@@ -275,7 +277,7 @@ export default function SesionFocoScreen() {
 
     if (!activeSession) {
         return (
-            <SafeAreaView style={styles.safe}>
+            <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
                 <View style={styles.container}>
                     <Text style={styles.title}>Guardián de Hiperfoco</Text>
                     <Text style={styles.subtitle}>
@@ -295,7 +297,11 @@ export default function SesionFocoScreen() {
     // ─── Render: sesión activa ───────────────────────────────────────────────────
 
     return (
-        <SafeAreaView style={[styles.safeActive, isOvertime && styles.safeOvertime]}>
+        <SafeAreaView style={[
+            styles.safeActive,
+            { backgroundColor: colors.bg },
+            isOvertime && styles.safeOvertime
+        ]}>
             <View style={styles.container}>
                 {isOvertime && (
                     <View style={styles.overtimeBanner}>

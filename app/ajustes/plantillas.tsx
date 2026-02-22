@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getPartnerTemplates, updatePartnerTemplate } from '../../src/db/partnerTemplates';
+import { useTheme } from '../src/context/ThemeContext';
 
 export default function PlantillasScreen() {
+  const { colors } = useTheme();
+  const [partnerFilter, setPartnerFilter] = useState<'rojo' | 'todo'>('rojo');
   const [items, setItems] = useState<{ id: number; tipo: string; texto: string }[]>([]);
 
   useEffect(() => {
@@ -25,9 +28,11 @@ export default function PlantillasScreen() {
   const acciones = items.filter((t) => t.tipo === 'accion');
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Plantillas WhatsApp</Text>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.text }]}>Plantillas Compartidas</Text>
+        </View>
         <Text style={styles.sectionTitle}>Pedidos</Text>
         {pedidos.map((p) => (
           <View key={p.id} style={styles.row}>

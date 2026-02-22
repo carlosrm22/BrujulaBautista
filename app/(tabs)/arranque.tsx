@@ -8,6 +8,7 @@ import type { TaskRow } from '../../src/db/initDb.native';
 import { InfoTip } from '../../src/components/InfoTip';
 import { startFocusSession } from '../../src/db/focusSessions';
 import { getSetting } from '../../src/db/settings';
+import { useTheme } from '../../src/context/ThemeContext';
 
 const DONDE_OPCIONES = ['Archivo', 'App', 'Objeto', 'Lugar'];
 const TIEMPO_OPCIONES = [2, 5, 15, 45];
@@ -15,6 +16,7 @@ const TIEMPO_OPCIONES = [2, 5, 15, 45];
 type Step = 1 | 2 | 3 | 'congelado';
 
 export default function ArranqueScreen() {
+  const { colors } = useTheme();
   const [step, setStep] = useState<Step>(1);
   const [titulo, setTitulo] = useState('');
   const [definicionDone, setDefinicionDone] = useState('');
@@ -165,10 +167,10 @@ export default function ArranqueScreen() {
 
   if (step === 'congelado') {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.headerRow}>
-            <Text style={styles.title}>Desambiguar</Text>
+            <Text style={[styles.title, { color: colors.text }]}>Desambiguar</Text>
             <InfoTip
               title="Desambiguar"
               description="Estrategias para cuando te sientes congelado. Reducen la fricción mental a lo mínimo posible mediante micro-acciones."
@@ -191,9 +193,9 @@ export default function ArranqueScreen() {
 
   if (step === 3) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.stepLabel}>Primer paso:</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Punto de Arranque</Text>
           <Text style={styles.primerPasoText}>{primerPaso}</Text>
           <View style={styles.timerBox}>
             <Text style={styles.timerText}>
@@ -208,7 +210,7 @@ export default function ArranqueScreen() {
               style={styles.smallBtn}
               onPress={() => setTimerRunning((r) => !r)}
             >
-              <Text style={styles.btnText}>{timerRunning ? 'Pausar' : 'Iniciar'}</Text>
+              <Text style={styles.btnText}>{(timerRunning ? 'Pausar' : 'Iniciar')}</Text>
             </Pressable>
             <Pressable style={styles.smallBtn} onPress={() => { setTimerSec(120); setTimerRunning(false); }}>
               <Text style={styles.btnText}>Reiniciar</Text>
@@ -227,10 +229,10 @@ export default function ArranqueScreen() {
 
   if (step === 2) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.headerRow}>
-            <Text style={styles.title}>Arranque 2 min</Text>
+            <Text style={[styles.title, { color: colors.text }]}>Arranque 2 min</Text>
             <InfoTip
               title="Arranque de 2 minutos"
               description="Divide cualquier tarea abrumadora definiendo claramente qué significa terminarla y cuál es el primer paso físico e inmediato de 30 segundos, reduciendo la fricción para empezar."
@@ -301,10 +303,10 @@ export default function ArranqueScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerRow}>
-          <Text style={styles.title}>Arranque 2 min</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Mis Tareas</Text>
           <InfoTip
             title="Arranque de 2 minutos"
             description="Divide cualquier tarea abrumadora definiendo claramente qué significa terminarla y cuál es el primer paso físico e inmediato de 30 segundos, reduciendo la fricción para empezar."

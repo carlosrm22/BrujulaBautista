@@ -1,61 +1,60 @@
 /**
- * Tokens de diseño compartidos para Brújula.
- * Import en cualquier componente: import { colors, type, radii, spacing } from '../constants/theme';
+ * Tokens de diseño para Brújula — soporta dark y light mode.
  */
 
-export const colors = {
-    // Fondo
+export const lightColors = {
     bg: '#f8fafc',
     bgCard: '#ffffff',
     bgMuted: '#f1f5f9',
 
-    // Texto
     text: '#0f172a',
     textSecond: '#475569',
     textMuted: '#94a3b8',
 
-    // Marca / primario
-    primary: '#7c3aed',       // Violeta brújula
+    primary: '#7c3aed',
     primaryLight: '#ede9fe',
-    primaryDark: '#5b21b6',
 
-    // Semáforo
+    border: '#e2e8f0',
+    borderFocus: '#7c3aed',
+
     verde: '#22c55e',
     amarillo: '#eab308',
     rojo: '#ef4444',
 
-    // Bordes
-    border: '#e2e8f0',
-    borderFocus: '#7c3aed',
-
-    // Danger
     danger: '#ef4444',
     dangerLight: '#fee2e2',
 
-    // Extra
     white: '#ffffff',
     black: '#000000',
 };
 
-export const type = {
-    // Familias
-    default: 'System',    // expo-font sin configuración adicional
+export const darkColors: typeof lightColors = {
+    bg: '#0f172a',
+    bgCard: '#1e293b',
+    bgMuted: '#1e293b',
 
-    // Tamaños
-    xs: 12,
-    sm: 14,
-    md: 16,
-    lg: 18,
-    xl: 22,
-    xxl: 28,
+    text: '#f1f5f9',
+    textSecond: '#94a3b8',
+    textMuted: '#64748b',
 
-    // Pesos
-    normal: '400' as const,
-    medium: '500' as const,
-    semibold: '600' as const,
-    bold: '700' as const,
-    extrabold: '800' as const,
+    primary: '#7c3aed',
+    primaryLight: '#2e1065',
+
+    border: '#334155',
+    borderFocus: '#7c3aed',
+
+    verde: '#22c55e',
+    amarillo: '#eab308',
+    rojo: '#ef4444',
+
+    danger: '#ef4444',
+    dangerLight: '#450a0a',
+
+    white: '#ffffff',
+    black: '#000000',
 };
+
+export type AppColors = typeof lightColors;
 
 export const radii = {
     sm: 6,
@@ -66,11 +65,7 @@ export const radii = {
 };
 
 export const spacing = {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
+    xs: 4, sm: 8, md: 16, lg: 24, xl: 32,
 };
 
 export const shadow = {

@@ -13,6 +13,7 @@ import { getCompletedTasks, deleteTask as dbDeleteTask } from '../../src/db/task
 import { getSocialLogs, deleteSocialLog as dbDeleteSocialLog } from '../../src/db/socialLogs';
 import type { TaskRow, SocialLogRow, FocusSessionRow } from '../../src/db/initDb.native';
 import { getFocusSessionsHistory } from '../../src/db/focusSessions';
+import { useTheme } from '../../src/context/ThemeContext';
 
 type Period = '7d' | '30d' | 'all';
 
@@ -39,6 +40,7 @@ const SEMAFORO_COLORS: Record<string, string> = {
 };
 
 export default function HistorialScreen() {
+    const { colors } = useTheme();
     const [tab, setTab] = useState<'checkins' | 'tareas' | 'social' | 'hiperfoco'>('checkins');
     const [period, setPeriod] = useState<Period>('7d');
     const [entries, setEntries] = useState<CheckInWithTime[]>([]);
@@ -141,9 +143,9 @@ export default function HistorialScreen() {
     };
 
     return (
-        <SafeAreaView style={styles.safe} edges={['top']}>
+        <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
             <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-                <Text style={styles.title}>Historial</Text>
+                <Text style={[styles.title, { color: colors.text }]}>Historial</Text>
 
                 <View style={styles.topTabs}>
                     <Pressable style={[styles.topTab, tab === 'checkins' && styles.topTabActive]} onPress={() => setTab('checkins')}>

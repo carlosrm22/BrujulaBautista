@@ -2,15 +2,17 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../src/context/ThemeContext';
 import { getAllProtocols } from '../../src/db/protocols';
 import type { Protocol } from '../../src/db/protocols';
 import { InfoTip } from '../../src/components/InfoTip';
 
 export default function ProtocolosScreen() {
-  const [list, setList] = useState<Protocol[]>([]);
+  const { colors } = useTheme();
+  const [protocols, setProtocols] = useState<Protocol[]>([]);
 
   useEffect(() => {
-    getAllProtocols().then(setList);
+    getAllProtocols().then(setProtocols);
   }, []);
 
   const renderItem = ({ item }: { item: Protocol }) => (
@@ -24,17 +26,17 @@ export default function ProtocolosScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.title}>Protocolos</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Protocolos</Text>
         <InfoTip
           title="¿Qué son los protocolos?"
           description="Una lista paso a paso de tareas complejas pero recurrentes para hacer en automático sin tener que pensar el proceso cada vez."
         />
       </View>
       <FlatList
-        data={list}
-        keyExtractor={(item) => String(item.id)}
+        data={protocols}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
       />

@@ -4,17 +4,19 @@ import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { initDb } from '../src/db/initDb';
+import { ThemeProvider, useTheme } from '../src/context/ThemeContext';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldPlaySound: false,   // OFF por defecto según PRD (baja carga sensorial)
+    shouldPlaySound: false,
     shouldSetBadge: false,
     shouldShowBanner: true,
     shouldShowList: true,
   }),
 });
 
-export default function RootLayout() {
+function AppShell() {
+  const { theme, colors } = useTheme();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -27,14 +29,12 @@ export default function RootLayout() {
         setReady(true);
       });
 
-    // Pedir permisos de notificación al abrir la app
     Notifications.requestPermissionsAsync().then((status) => {
       if (status.status !== 'granted') {
         console.warn('No se otorgaron permisos de notificación.');
       }
     });
 
-    // Navegar a sesion-foco con CTA cuando el usuario toca una notificación de bedtime
     const sub = Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data as { cta?: string } | undefined;
       if (data?.cta === 'bedtime') {
@@ -49,24 +49,18 @@ export default function RootLayout() {
 
   if (Platform.OS === 'web') {
     return (
-      <View style={styles.webPlaceholder}>
-        <Text style={styles.webTitle}>Brújula</Text>
-        <Text style={styles.webText}>
+      <View style={[styles.webPlaceholder, { backgroundColor: colors.bg }]}>
+        <Text style={[styles.webTitle, { color: colors.text }]}>Brújula</Text>
+        <Text style={[styles.webText, { color: colors.textSecond }]}>
           Esta app usa almacenamiento local (SQLite) y está pensada para usarse en el móvil.
         </Text>
-        <Text style={styles.webText}>
-          Abre la app <Text style={styles.webBold}>Expo Go</Text> en tu teléfono, escanea el código QR
-          que aparece en la terminal donde ejecutaste <Text style={styles.webCode}>npx expo start</Text>, y
-          abre el proyecto desde ahí.
-        </Text>
-        <Text style={styles.webSub}>Asegúrate de que el móvil y el PC estén en la misma red WiFi.</Text>
       </View>
     );
   }
 
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="rojo-descarga" />
@@ -80,17 +74,21 @@ export default function RootLayout() {
   );
 }
 
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <AppShell />
+    </ThemeProvider>
+  );
+}
+
 const styles = StyleSheet.create({
   webPlaceholder: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 32,
-    backgroundColor: '#f8fafc',
   },
-  webTitle: { fontSize: 28, fontWeight: '700', marginBottom: 24, color: '#1e293b' },
-  webText: { fontSize: 16, textAlign: 'center', color: '#475569', marginBottom: 16, lineHeight: 24 },
-  webBold: { fontWeight: '700', color: '#1e293b' },
-  webCode: { fontFamily: 'monospace', backgroundColor: '#e2e8f0', paddingHorizontal: 6 },
-  webSub: { fontSize: 14, color: '#64748b', marginTop: 8 },
+  webTitle: { fontSize: 28, fontWeight: '700', marginBottom: 24 },
+  webText: { fontSize: 16, textAlign: 'center', marginBottom: 16, lineHeight: 24 },
 });
