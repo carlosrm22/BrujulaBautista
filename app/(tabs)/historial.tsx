@@ -11,7 +11,8 @@ import {
 } from '../../src/db/checkins';
 import { getCompletedTasks, deleteTask as dbDeleteTask } from '../../src/db/tasks';
 import { getSocialLogs, deleteSocialLog as dbDeleteSocialLog } from '../../src/db/socialLogs';
-import type { TaskRow, SocialLogRow } from '../../src/db/initDb.native';
+import type { TaskRow, SocialLogRow, FocusSessionRow } from '../../src/db/initDb.native';
+import { getFocusSessionsHistory } from '../../src/db/focusSessions';
 
 type Period = '7d' | '30d' | 'all';
 
@@ -38,20 +39,22 @@ const SEMAFORO_COLORS: Record<string, string> = {
 };
 
 export default function HistorialScreen() {
-    const [tab, setTab] = useState<'checkins' | 'tareas' | 'social'>('checkins');
+    const [tab, setTab] = useState<'checkins' | 'tareas' | 'social' | 'hiperfoco'>('checkins');
     const [period, setPeriod] = useState<Period>('7d');
     const [entries, setEntries] = useState<CheckInWithTime[]>([]);
     const [stats, setStats] = useState<CheckInStats | null>(null);
     const [tasks, setTasks] = useState<TaskRow[]>([]);
     const [socialLogs, setSocialLogs] = useState<SocialLogRow[]>([]);
+    const [focusSessions, setFocusSessions] = useState<FocusSessionRow[]>([]);
 
     const loadData = useCallback(async () => {
         const range = periodToRange(period);
-        const [allEntries, allStats, lastTasks, lastSocial] = await Promise.all([
+        const [allEntries, allStats, lastTasks, lastSocial, sessions] = await Promise.all([
             getAllCheckIns(200),
             getCheckInStats(range.from, range.to),
             getCompletedTasks(),
             getSocialLogs(),
+            getFocusSessionsHistory(100),
         ]);
 
         if (range.from && range.to) {
@@ -62,6 +65,7 @@ export default function HistorialScreen() {
         setStats(allStats);
         setTasks(lastTasks);
         setSocialLogs(lastSocial);
+        setFocusSessions(sessions);
     }, [period]);
 
     useEffect(() => {
@@ -150,6 +154,9 @@ export default function HistorialScreen() {
                     </Pressable>
                     <Pressable style={[styles.topTab, tab === 'social' && styles.topTabActive]} onPress={() => setTab('social')}>
                         <Text style={[styles.topTabText, tab === 'social' && styles.topTabTextActive]}>Social</Text>
+                    </Pressable>
+                    <Pressable style={[styles.topTab, tab === 'hiperfoco' && styles.topTabActive]} onPress={() => setTab('hiperfoco')}>
+                        <Text style={[styles.topTabText, tab === 'hiperfoco' && styles.topTabTextActive]}>🧠 Foco</Text>
                     </Pressable>
                 </View>
 
@@ -381,6 +388,97 @@ export default function HistorialScreen() {
                         )}
                     </View>
                 )}
+
+                {tab === 'hiperfoco' && (() => {
+                    const totalSessions = focusSessions.length;
+                    const totalOvertime = focusSessions.reduce((acc, s) => acc + (s.over_bedtime_minutes || 0), 0);
+                    const sessionsWithDuration = focusSessions.filter(s => s.end_ts && s.start_ts);
+                    const avgDurationMins = sessionsWithDuration.length
+                        ? Math.round(sessionsWithDuration.reduce((acc, s) => acc + Math.floor(((s.end_ts || 0) - s.start_ts) / 60000), 0) / sessionsWithDuration.length)
+                        : 0;
+
+                    const reasonLabel: Record<string, string> = {
+                        cierre: '✅ Cierre planificado',
+                        dormir: '🛌 A dormir',
+                    };
+
+                    return (
+                        <View>
+                            {totalSessions === 0 ? (
+                                <View style={styles.emptyState}>
+                                    <Text style={styles.emptyText}>
+                                        No hay sesiones de hiperfoco registradas aún.{`\n`}Inicia una desde la pantalla de Estado.
+                                    </Text>
+                                </View>
+                            ) : (
+                                <>
+                                    {/* Estadísticas resumen */}
+                                    <Text style={styles.sectionTitle}>Resumen</Text>
+                                    <View style={styles.statsGrid}>
+                                        <View style={styles.statCard}>
+                                            <Text style={styles.statNumber}>{totalSessions}</Text>
+                                            <Text style={styles.statLabel}>Sesiones</Text>
+                                        </View>
+                                        <View style={styles.statCard}>
+                                            <Text style={styles.statNumber}>{avgDurationMins}m</Text>
+                                            <Text style={styles.statLabel}>Duración prom.</Text>
+                                        </View>
+                                        <View style={styles.statCard}>
+                                            <Text style={[styles.statNumber, totalOvertime > 0 && { color: '#ef4444' }]}>
+                                                {totalOvertime}m
+                                            </Text>
+                                            <Text style={styles.statLabel}>Overtime total</Text>
+                                        </View>
+                                    </View>
+
+                                    {/* Lista de sesiones */}
+                                    <Text style={styles.sectionTitle}>Sesiones</Text>
+                                    {focusSessions.map((s) => {
+                                        const durationMins = s.end_ts
+                                            ? Math.floor((s.end_ts - s.start_ts) / 60000)
+                                            : null;
+                                        const hasOvertime = (s.over_bedtime_minutes || 0) > 0;
+
+                                        return (
+                                            <View key={s.id} style={[
+                                                styles.focusCard,
+                                                hasOvertime && styles.focusCardOvertime,
+                                            ]}>
+                                                <View style={styles.focusCardHeader}>
+                                                    <Text style={styles.focusCardDate}>
+                                                        {formatDate(s.start_ts)}
+                                                    </Text>
+                                                    {durationMins !== null && (
+                                                        <Text style={styles.focusCardDuration}>
+                                                            {durationMins >= 60
+                                                                ? `${Math.floor(durationMins / 60)}h ${durationMins % 60}m`
+                                                                : `${durationMins}m`}
+                                                        </Text>
+                                                    )}
+                                                </View>
+                                                <View style={styles.focusCardBody}>
+                                                    {s.break_minutes && (
+                                                        <Text style={styles.focusCardMeta}>⏱ Cortes c/{s.break_minutes}min</Text>
+                                                    )}
+                                                    {s.ended_reason && (
+                                                        <Text style={styles.focusCardMeta}>
+                                                            {reasonLabel[s.ended_reason] ?? s.ended_reason}
+                                                        </Text>
+                                                    )}
+                                                    {hasOvertime && (
+                                                        <Text style={styles.focusCardOverread}>
+                                                            ⚠️ +{s.over_bedtime_minutes}min extra
+                                                        </Text>
+                                                    )}
+                                                </View>
+                                            </View>
+                                        );
+                                    })}
+                                </>
+                            )}
+                        </View>
+                    );
+                })()}
             </ScrollView>
         </SafeAreaView>
     );
@@ -401,7 +499,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         backgroundColor: '#e2e8f0',
     },
-    periodBtnActive: { backgroundColor: '#2563eb' },
+    periodBtnActive: { backgroundColor: '#7c3aed' },
     periodText: { fontSize: 14, fontWeight: '500', color: '#64748b' },
     periodTextActive: { color: '#fff' },
 
@@ -501,4 +599,27 @@ const styles = StyleSheet.create({
     taskTitle: { fontSize: 16, fontWeight: '600', color: '#0f172a', flex: 1 },
     taskDate: { fontSize: 13, color: '#64748b', marginRight: 12 },
     taskTime: { fontSize: 14, color: '#334155' },
+
+    // Focus session cards
+    focusCard: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 14,
+        marginBottom: 8,
+        borderLeftWidth: 3,
+        borderLeftColor: '#7c3aed',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.04,
+        shadowRadius: 2,
+        elevation: 1,
+    },
+    focusCardOvertime: { borderLeftColor: '#ef4444' },
+    focusCardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
+    focusCardDate: { fontSize: 14, fontWeight: '600', color: '#334155' },
+    focusCardDuration: { fontSize: 14, fontWeight: '700', color: '#7c3aed' },
+    focusCardBody: { gap: 2 },
+    focusCardMeta: { fontSize: 13, color: '#64748b' },
+    focusCardOverread: { fontSize: 13, fontWeight: '600', color: '#ef4444', marginTop: 2 },
 });
+

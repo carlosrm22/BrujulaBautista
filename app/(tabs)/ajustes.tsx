@@ -14,7 +14,9 @@ export default function AjustesScreen() {
   const [rojoChecklist, setRojoChecklist] = useState<string[]>(DEFAULT_ROJO_CHECKLIST);
   const [editSection, setEditSection] = useState<'none' | 'rojo' | 'foco'>('none');
   const [focoBreak, setFocoBreak] = useState('45');
-  const [focoBedtime, setFocoBedtime] = useState('60'); // 1 am en minutos después de medianoche
+  // Bedtime guardado en DB como minutos desde medianoche (0-1439)
+  const [bedtimeHour, setBedtimeHour] = useState(1);   // default 01:00
+  const [bedtimeMin, setBedtimeMin] = useState(0);
 
   useEffect(() => {
     getSetting(SETTINGS_KEY_ROJO_CHECKLIST).then((val) => {
@@ -27,7 +29,13 @@ export default function AjustesScreen() {
       }
     });
     getSetting('foco_break_minutes').then(val => { if (val) setFocoBreak(val); });
-    getSetting('foco_bedtime_minutes').then(val => { if (val) setFocoBedtime(val); });
+    getSetting('foco_bedtime_minutes').then(val => {
+      if (val) {
+        const totalMins = parseInt(val, 10);
+        setBedtimeHour(Math.floor(totalMins / 60) % 24);
+        setBedtimeMin(totalMins % 60);
+      }
+    });
   }, []);
 
   const saveRojoChecklist = () => {
@@ -37,11 +45,17 @@ export default function AjustesScreen() {
   };
 
   const saveFocoSettings = () => {
+    const totalMins = (bedtimeHour % 24) * 60 + (bedtimeMin % 60);
     Promise.all([
       setSetting('foco_break_minutes', focoBreak),
-      setSetting('foco_bedtime_minutes', focoBedtime)
+      setSetting('foco_bedtime_minutes', String(totalMins))
     ]).then(() => setEditSection('none'));
   };
+
+  const clampHour = (h: number) => ((h % 24) + 24) % 24;
+  const clampMin = (m: number) => ((m % 60) + 60) % 60;
+  const pad2 = (n: number) => String(n).padStart(2, '0');
+  const bedtimeLabel = `${pad2(bedtimeHour)}:${pad2(bedtimeMin)}`;
 
   const updateRojoItem = (index: number, text: string) => {
     setRojoChecklist((prev) => {
@@ -150,7 +164,7 @@ export default function AjustesScreen() {
           <Text style={styles.sectionTitle}>Guardián de Hiperfoco</Text>
           <InfoTip
             title="Ajustes de Hiperfoco"
-            description="Controla la frecuencia con la que la app te pide tomar descansos (cortes suaves) y establece una hora límite de sueño estimada en minutos desde la medianoche (ej: 01:00 AM = 60 mins)."
+            description="Controla la frecuencia de los cortes suaves y establece la hora estimada a la que quieres irte a dormir."
           />
         </View>
 
@@ -163,20 +177,40 @@ export default function AjustesScreen() {
               onChangeText={setFocoBreak}
               keyboardType="numeric"
             />
-            <Text style={styles.label}>Hora de ir a dormir (en mins tras las 12 AM)</Text>
-            <TextInput
-              style={styles.input}
-              value={focoBedtime}
-              onChangeText={setFocoBedtime}
-              keyboardType="numeric"
-            />
+
+            {/* Picker HH:MM para hora de dormir */}
+            <Text style={styles.label}>Hora de ir a dormir</Text>
+            <View style={styles.timePicker}>
+              {/* Horas */}
+              <View style={styles.timeCol}>
+                <Pressable style={styles.timeBtn} onPress={() => setBedtimeHour(h => clampHour(h + 1))}>
+                  <Text style={styles.timeBtnText}>▲</Text>
+                </Pressable>
+                <Text style={styles.timeNum}>{pad2(bedtimeHour)}</Text>
+                <Pressable style={styles.timeBtn} onPress={() => setBedtimeHour(h => clampHour(h - 1))}>
+                  <Text style={styles.timeBtnText}>▼</Text>
+                </Pressable>
+              </View>
+              <Text style={styles.timeSep}>:</Text>
+              {/* Minutos */}
+              <View style={styles.timeCol}>
+                <Pressable style={styles.timeBtn} onPress={() => setBedtimeMin(m => clampMin(m + 5))}>
+                  <Text style={styles.timeBtnText}>▲</Text>
+                </Pressable>
+                <Text style={styles.timeNum}>{pad2(bedtimeMin)}</Text>
+                <Pressable style={styles.timeBtn} onPress={() => setBedtimeMin(m => clampMin(m - 5))}>
+                  <Text style={styles.timeBtnText}>▼</Text>
+                </Pressable>
+              </View>
+            </View>
+
             <Pressable style={styles.btn} onPress={saveFocoSettings}>
               <Text style={styles.btnText}>Guardar</Text>
             </Pressable>
           </View>
         ) : (
           <Pressable style={styles.link} onPress={() => setEditSection('foco')}>
-            <Text style={styles.linkText}>Editar reglas del Guardián</Text>
+            <Text style={styles.linkText}>Editar reglas del Guardián  ·  🕐 {bedtimeLabel}</Text>
           </Pressable>
         )}
 
@@ -211,30 +245,56 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#f8fafc' },
   scroll: { flex: 1 },
   scrollContent: { padding: 16, paddingBottom: 32 },
-  title: { fontSize: 24, fontWeight: '600', marginBottom: 24 },
+  title: { fontSize: 24, fontWeight: '700', marginBottom: 24, color: '#0f172a' },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
-  sectionTitle: { fontSize: 18, fontWeight: '600' },
+  sectionTitle: { fontSize: 18, fontWeight: '600', color: '#0f172a' },
   link: { paddingVertical: 12, marginBottom: 16 },
-  linkText: { fontSize: 16, color: '#2563eb' },
+  linkText: { fontSize: 16, color: '#7c3aed', fontWeight: '500' },
   input: {
     borderWidth: 1,
     borderColor: '#cbd5e1',
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 12,
     marginBottom: 8,
     fontSize: 16,
+    backgroundColor: '#fff',
   },
-  label: { fontSize: 14, fontWeight: '500', color: '#475569', marginBottom: 4 },
+  label: { fontSize: 14, fontWeight: '500', color: '#475569', marginBottom: 6 },
   btn: {
-    minHeight: 48,
-    backgroundColor: '#2563eb',
-    borderRadius: 8,
+    minHeight: 50,
+    backgroundColor: '#7c3aed',
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
   },
-  btnSec: { backgroundColor: 'transparent', borderWidth: 2, borderColor: '#2563eb' },
-  btnText: { fontSize: 16, fontWeight: '600', color: '#fff' },
-  btnTextSec: { fontSize: 16, fontWeight: '600', color: '#2563eb' },
+  btnSec: { backgroundColor: 'transparent', borderWidth: 2, borderColor: '#7c3aed' },
+  btnText: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  btnTextSec: { fontSize: 16, fontWeight: '700', color: '#7c3aed' },
   copy: { fontSize: 14, color: '#64748b', marginBottom: 24 },
+
+  // Time picker HH:MM
+  timePicker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    gap: 8,
+  },
+  timeCol: { alignItems: 'center', gap: 4 },
+  timeBtn: {
+    backgroundColor: '#ede9fe',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  timeBtnText: { fontSize: 18, color: '#7c3aed', fontWeight: '700' },
+  timeNum: { fontSize: 40, fontWeight: '800', color: '#0f172a', fontVariant: ['tabular-nums'], minWidth: 56, textAlign: 'center' },
+  timeSep: { fontSize: 40, fontWeight: '800', color: '#94a3b8', marginBottom: 4 },
 });
+

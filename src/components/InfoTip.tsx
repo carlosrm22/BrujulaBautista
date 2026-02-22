@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
         paddingVertical: 8,
         paddingHorizontal: 16,
-        backgroundColor: '#2563eb',
+        backgroundColor: '#7c3aed',
         borderRadius: 8,
     },
     closeText: { fontSize: 14, fontWeight: '600', color: '#fff' },

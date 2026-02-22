@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     borderColor: '#cbd5e1',
     alignItems: 'center',
   },
-  estadoBtnActive: { backgroundColor: '#2563eb', borderColor: '#2563eb' },
+  estadoBtnActive: { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   estadoBtnText: { fontSize: 14, color: '#64748b' },
   estadoBtnTextActive: { color: '#fff' },
   card: {
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     borderColor: '#e2e8f0',
     marginBottom: 8,
   },
-  cardSelected: { borderColor: '#2563eb', backgroundColor: '#eff6ff' },
+  cardSelected: { borderColor: '#7c3aed', backgroundColor: '#eff6ff' },
   cardText: { fontSize: 15 },
   preview: {
     padding: 12,
@@ -158,14 +158,14 @@ const styles = StyleSheet.create({
   previewText: { fontSize: 14, color: '#334155' },
   btn: {
     minHeight: 48,
-    backgroundColor: '#2563eb',
+    backgroundColor: '#7c3aed',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
   },
   btnDisabled: { opacity: 0.5 },
-  btnSec: { backgroundColor: 'transparent', borderWidth: 2, borderColor: '#2563eb' },
+  btnSec: { backgroundColor: 'transparent', borderWidth: 2, borderColor: '#7c3aed' },
   btnText: { fontSize: 16, fontWeight: '600', color: '#fff' },
-  btnTextSec: { fontSize: 16, fontWeight: '600', color: '#2563eb' },
+  btnTextSec: { fontSize: 16, fontWeight: '600', color: '#7c3aed' },
 });

@@ -56,6 +56,18 @@ export interface FocusSessionRow {
   over_bedtime_minutes?: number;
 }
 
+export interface SocialLogRow {
+  id: number;
+  timestamp: number;
+  fase: 'antes' | 'despues';
+  duracion?: string;
+  riesgo_sensorial?: string;
+  llevar_tapones?: number;
+  costo_social?: number;
+  costo_sensorial?: number;
+}
+
+
 let db: SQLite.SQLiteDatabase | null = null;
 
 const SCHEMA = `

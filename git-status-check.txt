@@ -1,0 +1,14 @@
+En la rama main
+Tu rama está actualizada con 'origin/main'.
+
+Cambios no rastreados para el commit:
+  (usa "git add <archivo>..." para actualizar lo que será confirmado)
+  (usa "git restore <archivo>..." para descartar los cambios en el directorio de trabajo)
+	modificados:     app/(tabs)/historial.tsx
+	modificados:     src/db/initDb.native.ts
+
+Archivos sin seguimiento:
+  (usa "git add <archivo>..." para incluirlo a lo que será confirmado)
+	git-status-check.txt
+
+sin cambios agregados al commit (usa "git add" y/o "git commit -a")

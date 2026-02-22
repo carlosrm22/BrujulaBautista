@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginRight: 12,
   },
-  checkboxChecked: { backgroundColor: '#2563eb', borderColor: '#2563eb' },
+  checkboxChecked: { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   checkLabel: { fontSize: 16, flex: 1 },
   durationRow: { flexDirection: 'row', gap: 12, marginVertical: 24 },
   durBtn: {
@@ -147,12 +147,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#cbd5e1',
   },
-  durBtnActive: { backgroundColor: '#2563eb', borderColor: '#2563eb' },
+  durBtnActive: { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   durBtnText: { fontSize: 16, color: '#64748b' },
   durBtnTextActive: { color: '#fff' },
   btn: {
     minHeight: 48,
-    backgroundColor: '#2563eb',
+    backgroundColor: '#7c3aed',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   cierreButtons: { gap: 12, width: '100%', maxWidth: 280 },
   cierreBtn: {
     minHeight: 48,
-    backgroundColor: '#2563eb',
+    backgroundColor: '#7c3aed',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
